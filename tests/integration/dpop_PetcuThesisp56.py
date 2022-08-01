@@ -37,7 +37,7 @@ from pydcop import infrastructure
 from pydcop.algorithms.dpop import DpopAlgo
 from pydcop.dcop import relations
 from pydcop.dcop.objects import Variable
-from pydcop.infrastructure.run import Agent
+from pydcop.infrastructure.agents import Agent
 
 logging.basicConfig(level=logging.DEBUG)
 logging.info('DPOP sample 1 : 4 variables & 3 relations')

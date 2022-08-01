@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 import pathlib
 from collections import defaultdict
-from collections import Iterable as CollectionIterable
+from collections.abc import Iterable as CollectionIterable
 from typing import Dict, Iterable, Union, List
 
 import yaml
