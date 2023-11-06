@@ -121,8 +121,10 @@ def solve(dcop: DCOP,
             computation_memory=algo_module.computation_memory,
             communication_load=algo_module.communication_load)
 
+    # orchestrator = run_local_thread_dcop(algo_def, graph, distribution, dcop,
+                                         # INFINITY)
     orchestrator = run_local_thread_dcop(algo_def, graph, distribution, dcop,
-                                         INFINITY)
+                                         INFINITY, collector=Queue())
 
     try:
         print('Deploy')
@@ -132,7 +134,8 @@ def solve(dcop: DCOP,
         print('Running, wait ready')
         orchestrator.wait_ready()
         print('Done')
-        return orchestrator.end_metrics()['assignment']
+        # return orchestrator.end_metrics()['assignment']
+        return orchestrator.end_metrics()
 
     except Exception:
         orchestrator.stop_agents(5)

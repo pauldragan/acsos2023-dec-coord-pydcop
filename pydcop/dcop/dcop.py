@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-import collections
+import collections.abc as collections
 from typing import List, Tuple, Dict, Iterable, Union, Mapping
 
 from pydcop.dcop.objects import AgentDef, Variable, VariableDomain, \

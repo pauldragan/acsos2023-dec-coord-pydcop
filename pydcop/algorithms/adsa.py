@@ -256,7 +256,7 @@ class ADsaComputation(VariableComputation):
             n = len(self.neighbors)
             c = len(self.current_assignment)
 
-            print(f" {self.name} Still waiting for neighbors values {n-c} out of {n} ")
+            self.logger.debug(f" {self.name} Still waiting for neighbors values {n-c} out of {n} ")
             if self.logger.isEnabledFor(logging.DEBUG):
                 self.logger.debug(
                     f"Still waiting for neighbors values {n-c} out of {n} "

@@ -378,6 +378,7 @@ class Agent(object):
             computations really hosted on the agent are started before raising
             this Exception.
         """
+        self.logger.debug("Agent", computations, self._computations)
         if not self.is_running:
             raise AgentException('Cannot start computation on agent %s which '
                                  'is not started', self.name)

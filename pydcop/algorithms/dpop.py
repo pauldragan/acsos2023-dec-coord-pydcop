@@ -94,9 +94,10 @@ class DpopMessage(Message):
         # Dpop messages
         # UTIL : multi-dimensional matrices
         # VALUE :
-
+        # self.logger.debug("DPOP contents: {}", self.content)
         if self.type == "UTIL":
             # UTIL messages are multi-dimensional matrices
+            # self.logger.debug("DPOP UTIL shape: {}", self.content.shape)
             shape = self.content.shape
             size = 1
             for s in shape:
@@ -106,6 +107,7 @@ class DpopMessage(Message):
         elif self.type == "VALUE":
             # VALUE message are a value assignment for each var in the
             # separator of the sender
+            # self.logger.debug("DPOP VALUE size: {}", len(self.content[0]) * 2)
             return len(self.content[0]) * 2
 
     def __str__(self):
@@ -328,6 +330,8 @@ class DpopAlgo(VariableComputation):
         self.logger.debug(f"UTIL from {variable_name} : {recv_msg.content} at {t}")
         utils = recv_msg.content
 
+        self.logger.debug(f"UTIL from {variable_name} : {recv_msg.content} at {t}")
+
         # accumulate util messages until we got the UTIL from all our children
         self._joined_utils = join(self._joined_utils, utils)
         try:
@@ -404,6 +408,7 @@ class DpopAlgo(VariableComputation):
             f"{self.name}: on value message from {variable_name} : '{recv_msg}' at {t}"
         )
 
+        self.logger.debug(f"{self.name}: on value message from {variable_name} : '{recv_msg}' at {t}")
         value = recv_msg.content
 
         # Value msg contains the optimal assignment for all variables in our

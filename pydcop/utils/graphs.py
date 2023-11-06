@@ -228,12 +228,13 @@ def display_bipartite_graph(variables, relations):
         import matplotlib.pyplot as plt
 
         pos = nx.drawing.spring_layout(graph)
+        # pos = nx.drawing.planar_layout(graph)
         variables = set(n for n, d in graph.nodes(data=True) if d["bipartite"] == 0)
         factors = set(graph) - variables
         nx.draw_networkx_nodes(
             graph,
             pos=pos,
-            with_labels=True,
+            # with_labels=True,
             nodelist=variables,
             node_shape="o",
             node_color="b",
@@ -243,7 +244,7 @@ def display_bipartite_graph(variables, relations):
         nx.draw_networkx_nodes(
             graph,
             pos=pos,
-            with_labels=True,
+            # with_labels=True,
             nodelist=factors,
             node_shape="s",
             node_color="r",
