@@ -41,7 +41,6 @@ from pydcop.utils.simple_repr import SimpleRepr
 from pydcop.utils.various import func_args
 from pydcop.utils.expressionfunction import ExpressionFunction
 
-
 DEFAULT_TYPE = np.int32
 
 
@@ -809,6 +808,39 @@ class NAryMatrixRelation(AbstractBaseRelation, SimpleRepr):
         else:
             raise ValueError("Assignment must be dict or array")
 
+    def get_slice_for_assignment(self, var_values=None):
+        """
+        Returns the value of the relation for an assignment.
+
+        :param var_values: either a list or a dict.
+        * If var_values is a list, it must be  an array of values
+        representing a full assignment of the variables of the relation,
+        in the same order as the variables in the dimension.
+        * If it is a dict, it must be a var_name => var_value mapping
+
+        :return: the value of the relation.
+        """
+
+        if var_values is None:
+            if self._m.shape == ():
+                return self._m
+            else:
+                raise KeyError(
+                    "Needs an assignement when requesting value "
+                    "in a n-ari relation, n!=0"
+                )
+        if isinstance(var_values, list):
+            assignt = {self._variables[i].name: val for i, val in enumerate(var_values)}
+            u = self.slice(assignt)
+            return u
+
+        elif isinstance(var_values, dict):
+            u = self.slice(var_values)
+            return u
+
+        else:
+            raise ValueError("Assignment must be dict or array")
+
     def __call__(self, *args, **kwargs):
         """
         Shortcut method for get_value_for_assignment.
@@ -844,19 +876,26 @@ class NAryMatrixRelation(AbstractBaseRelation, SimpleRepr):
         """
         if isinstance(var_values, list):
             _, s = self._slice_matrix([v.name for v in self._variables], var_values)
-            matrix = np.copy(self._m)
-            matrix[s] = rel_value
-            return NAryMatrixRelation(self._variables, matrix, name=self.name)
+            # matrix = np.copy(self._m)
+            # matrix[s] = rel_value
+            relation = NAryMatrixRelation(self._variables, self._m, name=self.name)
+            relation.set_matrix_val(s, rel_value)
+            return relation
 
         elif isinstance(var_values, dict):
             values = []
             for v in self._variables:
                 values.append(var_values[v.name])
             _, s = self._slice_matrix([v.name for v in self._variables], values)
-            matrix = np.copy(self._m)
-            matrix.itemset(s, rel_value)
-            return NAryMatrixRelation(self._variables, matrix, name=self.name)
+            # matrix = np.copy(self._m)
+            # matrix.itemset(s, rel_value)
+            relation = NAryMatrixRelation(self._variables, self._m, name=self.name)
+            relation.set_matrix_val(s, rel_value)
+            return relation
         raise ValueError("Could not set value, must be list or dict")
+
+    def set_matrix_val(self, idx, val):
+        self._m[idx] = val
 
     @staticmethod
     def from_func_relation(rel: RelationProtocol) -> "NAryMatrixRelation":
@@ -1579,15 +1618,29 @@ def find_arg_optimal(variable, relation, mode):
                 "only on the given variable : {} {}".format(relation, variable)
             )
     var_val = list()
-    for v in variable.domain:
-        current_rel_val = relation(v)
-        if (mode == "max" and best_rel_val < current_rel_val) or (
-            mode == "min" and best_rel_val > current_rel_val
-        ):
-            best_rel_val = current_rel_val
-            var_val = [v]
-        elif current_rel_val == best_rel_val:
-            var_val.append(v)
+    #print("PyDCOP variable.domain. {} {}".format(variable, variable.domain))
+    # if isinstance(relation, NAryMatrixRelation):
+    if False:
+        sl = relation.get_slice_for_assignment(variable)
+        if mode == "max":
+            arg = np.argmax(sl)
+        else:
+            arg = np.argmin(sl)
+        val = sl[arg]
+
+        var_val = [arg]
+        best_rel_val = val
+    else:
+        for v in variable.domain:
+            current_rel_val = relation(v)
+            if (mode == "max" and best_rel_val < current_rel_val) or (
+                mode == "min" and best_rel_val > current_rel_val
+            ):
+                best_rel_val = current_rel_val
+                var_val = [v]
+            elif current_rel_val == best_rel_val:
+                var_val.append(v)
+
     return var_val, best_rel_val
 
 
